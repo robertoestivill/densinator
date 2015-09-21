@@ -65,9 +65,8 @@ Enter output dir [generated/]:
 ```bash
 $ tree
 .
-├── 1.png
-└── 2.png
-
+├── image1.png
+└── image2.png
 
 $ densinator
 Input files extension [PNG]:
@@ -90,31 +89,32 @@ Generate LDPI [No]:
 
 Enter output dir [generated/]:
 output
-Scaling 1.png to 144x144 in output/mipmap-xxhdpi/1.png
-Scaling 1.png to 96x96 in output/mipmap-xhdpi/1.png
-Scaling 1.png to 72x72 in output/mipmap-hdpi/1.png
-Scaling 1.png to 48x48 in output/mipmap-mdpi/1.png
-Scaling 2.png to 144x144 in output/mipmap-xxhdpi/2.png
-Scaling 2.png to 96x96 in output/mipmap-xhdpi/2.png
-Scaling 2.png to 72x72 in output/mipmap-hdpi/2.png
-Scaling 2.png to 48x48 in output/mipmap-mdpi/2.png
+
+Scaling image1.png to 144x144 in output/mipmap-xxhdpi/image1.png
+Scaling image1.png to 96x96 in output/mipmap-xhdpi/image1.png
+Scaling image1.png to 72x72 in output/mipmap-hdpi/image1.png
+Scaling image1.png to 48x48 in output/mipmap-mdpi/image1.png
+Scaling image2.png to 144x144 in output/mipmap-xxhdpi/image2.png
+Scaling image2.png to 96x96 in output/mipmap-xhdpi/image2.png
+Scaling image2.png to 72x72 in output/mipmap-hdpi/image2.png
+Scaling image2.png to 48x48 in output/mipmap-mdpi/image2.png
 Done.
 
 $ tree
 .
-├── 1.png
-├── 2.png
+├── image1.png
+├── image2.png
 └── output
     ├── mipmap-hdpi
-    │   ├── 1.png
-    │   └── 2.png
+    │   ├── image1.png
+    │   └── image2.png
     ├── mipmap-mdpi
-    │   ├── 1.png
-    │   └── 2.png
+    │   ├── image1.png
+    │   └── image2.png
     ├── mipmap-xhdpi
-    │   ├── 1.png
-    │   └── 2.png
+    │   ├── image1.png
+    │   └── image2.png
     └── mipmap-xxhdpi
-        ├── 1.png
-        └── 2.png
+        ├── image1.png
+        └── image2.png
 ```
