@@ -1,0 +1,131 @@
+#!/bin/sh
+
+# Requires ImageMagick
+# brew install imagemagick
+
+#################
+### FILES EXTENSION
+echo ""
+echo "Input files extension [PNG]:"
+echo "1) PNG"
+echo "2) JPG"
+echo "3) JPEG"
+read EXTENSION
+
+case "$EXTENSION" in
+  2) EXTENSION="JPG" ;;
+  3) EXTENSION="JPEG" ;;
+  *) EXTENSION="PNG" ;;
+esac
+FILES=`ls | grep -i $EXTENSION`
+
+#################
+### SCALE TYPE
+echo ""
+echo "Select scale type [Porcentual]:"
+echo "1) Porcentual"
+echo "2) Launcher icon"
+echo "3) Action bar icon"
+echo "4) Notification icon"
+read SCALE_TYPE
+
+case "$SCALE_TYPE" in
+  2) # SCALE_XXXHDPI="192x192"
+     SCALE_XXHDPI="144x144"
+     SCALE_XHDPI="96x96"
+     SCALE_HDPI="72x72"
+     SCALE_MDPI="48x48"
+     SCALE_LDPI="32x32" ;;
+
+  3) # SCALE_XXHDPI="128x128"
+     SCALE_XXHDPI="96x96"
+     SCALE_XHDPI="64x64"
+     SCALE_HDPI="48x48"
+     SCALE_MDPI="32x32"
+     SCALE_LDPI="24x24" ;;
+
+  4) # SCALE_XXHDPI="96x96"
+     SCALE_XXHDPI="72x72"
+     SCALE_XHDPI="48x48"
+     SCALE_HDPI="36x36"
+     SCALE_MDPI="24x24"
+     SCALE_LDPI="18x18" ;;
+
+  *) # SCALE_XXHDPI="96x96"
+     SCALE_XXHDPI="100%"
+     SCALE_XHDPI="66.6%"
+     SCALE_HDPI="50%"
+     SCALE_MDPI="33.3%"
+     SCALE_LDPI="25%" ;;
+esac
+
+#################
+### GENERATE LDPI
+echo ""
+echo "Generate LDPI [No]:"
+echo "1) No"
+echo "2) Yes"
+read GENERATE_LDPI
+
+case "$GENERATE_LDPI" in
+  2) GENERATE_LDPI=true ;;
+  *) GENERATE_LDPI=false ;;
+esac
+
+#################
+### SELECT OUTPUT DIR
+echo ""
+echo "Enter output dir [generated/]:"
+read OUTPUT_DIR
+if [ -z "$OUTPUT_DIR" ] ; then
+  OUTPUT_DIR="generated"
+fi
+
+case "$SCALE_TYPE" in
+  2) # OUTPUT_XXXHDPI="mipmap-xxxhdpi"
+     OUTPUT_XXHDPI="$OUTPUT_DIR/mipmap-xxhdpi"
+     OUTPUT_XHDPI="$OUTPUT_DIR/mipmap-xhdpi"
+     OUTPUT_HDPI="$OUTPUT_DIR/mipmap-hdpi"
+     OUTPUT_MDPI="$OUTPUT_DIR/mipmap-mdpi"
+     OUTPUT_LDPI="$OUTPUT_DIR/mipmap-ldpi" ;;
+
+  *) # OUTPUT_XXXHDPI="drawable-xxxhdpi"
+     OUTPUT_XXHDPI="$OUTPUT_DIR/drawable-xxhdpi"
+     OUTPUT_XHDPI="$OUTPUT_DIR/drawable-xhdpi"
+     OUTPUT_HDPI="$OUTPUT_DIR/drawable-hdpi"
+     OUTPUT_MDPI="$OUTPUT_DIR/drawable-mdpi"
+     OUTPUT_LDPI="$OUTPUT_DIR/drawable-ldpi" ;;
+esac
+
+mkdir -p "$OUTPUT_XXHDPI"
+mkdir -p "$OUTPUT_XHDPI"
+mkdir -p "$OUTPUT_HDPI"
+mkdir -p "$OUTPUT_MDPI"
+if $GENERATE_LDPI ; then
+  mkdir -p "$OUTPUT_LDPI"
+fi
+
+for FILE in ${FILES[*]}
+do
+    FILE_LOWER_CASE=$(echo "$FILE" | tr '[:upper:]' '[:lower:]')
+
+    echo "Scaling $FILE to $SCALE_XXHDPI in $OUTPUT_XXHDPI/$FILE_LOWER_CASE"
+    convert $FILE -resize $SCALE_XXHDPI! -strip $OUTPUT_XXHDPI/$FILE_LOWER_CASE
+
+    echo "Scaling $FILE to $SCALE_XHDPI in $OUTPUT_XHDPI/$FILE_LOWER_CASE"
+    convert $FILE -resize $SCALE_XHDPI! -strip $OUTPUT_XHDPI/$FILE_LOWER_CASE
+
+    echo "Scaling $FILE to $SCALE_HDPI in $OUTPUT_HDPI/$FILE_LOWER_CASE"
+    convert $FILE -resize $SCALE_HDPI! -strip $OUTPUT_HDPI/$FILE_LOWER_CASE
+
+    echo "Scaling $FILE to $SCALE_MDPI in $OUTPUT_MDPI/$FILE_LOWER_CASE"
+    convert $FILE -resize $SCALE_MDPI! -strip $OUTPUT_MDPI/$FILE_LOWER_CASE
+
+    if $GENERATE_LDPI ; then
+      echo "Scaling $FILE to $SCALE_LDPI in $OUTPUT_LDPI/$FILE_LOWER_CASE"
+      convert $FILE -resize $SCALE_LDPI! -strip $OUTPUT_LDPI/$FILE_LOWER_CASE
+    fi
+done
+
+echo "Done."
+open $OUTPUT_DIR
