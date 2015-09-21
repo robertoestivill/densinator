@@ -24,7 +24,7 @@ $ chmod +x densinator
 ## Inputs
 
 
-### File extension
+**File extension**
 
 ```
 Input files extension [PNG]:
@@ -34,7 +34,7 @@ Input files extension [PNG]:
 ```
 
 
-### Scale type
+**Scale type**
 
 ```
 Select scale type [Porcentual]:
@@ -45,7 +45,7 @@ Select scale type [Porcentual]:
 ```
 
 
-### Generate LDPI
+**Generate LDPI**
 
 ```
 Generate LDPI [No]:
@@ -54,7 +54,7 @@ Generate LDPI [No]:
 ```
 
 
-### Output directory
+**Output directory**
 
 ```
 Enter output dir [generated/]:
