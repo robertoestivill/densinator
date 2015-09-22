@@ -27,7 +27,9 @@
 
 #################
 ### SELECT FILES
-FILES_PNG=`ls | grep -i ".png"`
+OLDIFS="$IFS"
+IFS=$'\n'
+FILES_PNG=`ls | grep -i .png`
 FILES_JPG=`ls | grep -i .jpg`
 FILES_JPEG=`ls | grep -i .jpeg`
 FILES_ALL=( ${FILES_PNG[@]} ${FILES_JPG[@]} ${FILES_JPEG[@]} )
@@ -41,7 +43,7 @@ echo $(( ${#FILES_ALL[@]} + 1 ))") All"
 read FILE_SELECTION
 
 if [ -z "$FILE_SELECTION" ] || [ "$(( FILE_SELECTION - 1 ))" == "${#FILES_ALL[@]}" ] ; then
-  FILES=${FILES_ALL[@]}
+  FILES=( "${FILES_ALL[@]}" )
 else
   FILES=${FILES_ALL[$(( FILE_SELECTION - 1 ))]}
 fi
@@ -134,26 +136,28 @@ fi
 
 for FILE in ${FILES[*]}
 do
-    FILE_LOWER_CASE=$(echo "$FILE" | tr '[:upper:]' '[:lower:]')
+    FILE_NAME=$(echo "$FILE" | tr '[:upper:]' '[:lower:]')
+    FILE_NAME=${FILE_NAME// /_}
 
-    echo "Scaling $FILE to $SCALE_XXHDPI in $OUTPUT_XXHDPI/$FILE_LOWER_CASE"
-    convert $FILE -resize $SCALE_XXHDPI! -strip $OUTPUT_XXHDPI/$FILE_LOWER_CASE
+    echo "Scaling \"$FILE\" to $SCALE_XXHDPI in $OUTPUT_XXHDPI/$FILE_NAME"
+    convert $FILE -resize $SCALE_XXHDPI! -strip $OUTPUT_XXHDPI/$FILE_NAME
 
-    echo "Scaling $FILE to $SCALE_XHDPI in $OUTPUT_XHDPI/$FILE_LOWER_CASE"
-    convert $FILE -resize $SCALE_XHDPI! -strip $OUTPUT_XHDPI/$FILE_LOWER_CASE
+    echo "Scaling \"$FILE\" to $SCALE_XHDPI in $OUTPUT_XHDPI/$FILE_NAME"
+    convert $FILE -resize $SCALE_XHDPI! -strip $OUTPUT_XHDPI/$FILE_NAME
 
-    echo "Scaling $FILE to $SCALE_HDPI in $OUTPUT_HDPI/$FILE_LOWER_CASE"
-    convert $FILE -resize $SCALE_HDPI! -strip $OUTPUT_HDPI/$FILE_LOWER_CASE
+    echo "Scaling \"$FILE\" to $SCALE_HDPI in $OUTPUT_HDPI/$FILE_NAME"
+    convert $FILE -resize $SCALE_HDPI! -strip $OUTPUT_HDPI/$FILE_NAME
 
-    echo "Scaling $FILE to $SCALE_MDPI in $OUTPUT_MDPI/$FILE_LOWER_CASE"
-    convert $FILE -resize $SCALE_MDPI! -strip $OUTPUT_MDPI/$FILE_LOWER_CASE
+    echo "Scaling \"$FILE\" to $SCALE_MDPI in $OUTPUT_MDPI/$FILE_NAME"
+    convert $FILE -resize $SCALE_MDPI! -strip $OUTPUT_MDPI/$FILE_NAME
 
     if $GENERATE_LDPI ; then
-      echo "Scaling $FILE to $SCALE_LDPI in $OUTPUT_LDPI/$FILE_LOWER_CASE"
-      convert $FILE -resize $SCALE_LDPI! -strip $OUTPUT_LDPI/$FILE_LOWER_CASE
+      echo "Scaling \"$FILE\" to $SCALE_LDPI in $OUTPUT_LDPI/$FILE_NAME"
+      convert $FILE -resize $SCALE_LDPI! -strip $OUTPUT_LDPI/$FILE_NAME
     fi
     echo ""
 done
 
 echo "Done."
+IFS="$OLDIFS"
 open $OUTPUT_DIR
