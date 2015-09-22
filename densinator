@@ -4,20 +4,41 @@
 # brew install imagemagick
 
 #################
-### FILES EXTENSION
-echo ""
-echo "Input files extension [PNG]:"
-echo "1) PNG"
-echo "2) JPG"
-echo "3) JPEG"
-read EXTENSION
+### SCAN IMAGE FILES
+FILES_PNG=`ls | grep -i ".png"`
+FILES_JPG=`ls | grep -i .jpg`
+FILES_JPEG=`ls | grep -i .jpeg`
+FILES_ALL=( ${FILES_PNG[@]} ${FILES_JPG[@]} ${FILES_JPEG[@]} )
 
-case "$EXTENSION" in
-  2) EXTENSION="JPG" ;;
-  3) EXTENSION="JPEG" ;;
-  *) EXTENSION="PNG" ;;
-esac
-FILES=`ls | grep -i $EXTENSION`
+echo ""
+echo "Select file [ALL]:"
+for FILES_ALL_INDEX in "${!FILES_ALL[@]}"; do
+    echo $((FILES_ALL_INDEX + 1 ))") ${FILES_ALL[$FILES_ALL_INDEX]}"
+done
+echo $(( ${#FILES_ALL[@]} + 1 ))") All"
+read FILE_SELECTION
+
+if [ -z "$FILE_SELECTION" ] || [ "$(( FILE_SELECTION - 1 ))" == "${#FILES_ALL[@]}" ] ; then
+  FILES=${FILES_ALL[@]}
+else
+  FILES=${FILES_ALL[$(( FILE_SELECTION - 1 ))]}
+fi
+
+#################
+### FILES EXTENSION
+# echo ""
+# echo "Input files extension [PNG]:"
+# echo "1) PNG"
+# echo "2) JPG"
+# echo "3) JPEG"
+# read EXTENSION
+#
+# case "$EXTENSION" in
+#   2) EXTENSION="JPG" ;;
+#   3) EXTENSION="JPEG" ;;
+#   *) EXTENSION="PNG" ;;
+# esac
+# FILES=`ls | grep -i $EXTENSION`
 
 #################
 ### SCALE TYPE
@@ -125,6 +146,7 @@ do
       echo "Scaling $FILE to $SCALE_LDPI in $OUTPUT_LDPI/$FILE_LOWER_CASE"
       convert $FILE -resize $SCALE_LDPI! -strip $OUTPUT_LDPI/$FILE_LOWER_CASE
     fi
+    echo ""
 done
 
 echo "Done."
