@@ -3,7 +3,7 @@
 Densinator is a Bash script, that scans your current directory looking for image files, and generates the drawables for all Android densities.
 
 
-Densinator requires [ImageMagick](http://www.imagemagick.org/script/binary-releases.php) to be installed and correctly configured. 
+Densinator requires [ImageMagick](http://www.imagemagick.org/script/binary-releases.php) to be installed and correctly configured.
 
 ## Get the script
 
@@ -24,13 +24,13 @@ $ chmod +x densinator
 ## Inputs
 
 
-**File extension**
+**Select file**
 
 ```
-Input files extension [PNG]:
-1) PNG
-2) JPG
-3) JPEG
+Select file [ALL]:
+1) image1.png
+2) image2.png
+3) All
 ```
 
 
@@ -73,6 +73,7 @@ $ tree
 
 ```
 $ densinator
+
 Select file [ALL]:
 1) image1.png
 2) image2.png
