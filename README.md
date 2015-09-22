@@ -5,6 +5,8 @@ Densinator is a Bash script, that scans your current directory looking for image
 
 Densinator requires [ImageMagick](http://www.imagemagick.org/script/binary-releases.php) to be installed and correctly configured.
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Densinator-green.svg?style=flat)](https://android-arsenal.com/details/1/2535)
+
 ## Get the script
 
 ```
