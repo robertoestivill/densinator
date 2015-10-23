@@ -59,33 +59,33 @@ echo "4) Notification icon"
 read SCALE_TYPE
 
 case "$SCALE_TYPE" in
-  2) # SCALE_XXXHDPI="192x192"
+  2) SCALE_XXXHDPI="192x192"
      SCALE_XXHDPI="144x144"
      SCALE_XHDPI="96x96"
      SCALE_HDPI="72x72"
      SCALE_MDPI="48x48"
      SCALE_LDPI="32x32" ;;
 
-  3) # SCALE_XXHDPI="128x128"
+  3) SCALE_XXXHDPI="128x128"
      SCALE_XXHDPI="96x96"
      SCALE_XHDPI="64x64"
      SCALE_HDPI="48x48"
      SCALE_MDPI="32x32"
      SCALE_LDPI="24x24" ;;
 
-  4) # SCALE_XXHDPI="96x96"
+  4) SCALE_XXXHDPI="96x96"
      SCALE_XXHDPI="72x72"
      SCALE_XHDPI="48x48"
      SCALE_HDPI="36x36"
      SCALE_MDPI="24x24"
      SCALE_LDPI="18x18" ;;
 
-  *) # SCALE_XXHDPI="96x96"
-     SCALE_XXHDPI="100%"
-     SCALE_XHDPI="66.6%"
-     SCALE_HDPI="50%"
-     SCALE_MDPI="33.3%"
-     SCALE_LDPI="25%" ;;
+  *) SCALE_XXXHDPI="100%"
+     SCALE_XXHDPI="75%"
+     SCALE_XHDPI="50%"
+     SCALE_HDPI="37.5%"
+     SCALE_MDPI="25%"
+     SCALE_LDPI="18.75%" ;;
 esac
 
 #################
@@ -111,14 +111,14 @@ if [ -z "$OUTPUT_DIR" ] ; then
 fi
 
 case "$SCALE_TYPE" in
-  2) # OUTPUT_XXXHDPI="mipmap-xxxhdpi"
+  2) OUTPUT_XXXHDPI="$OUTPUT_DIR/mipmap-xxxhdpi"
      OUTPUT_XXHDPI="$OUTPUT_DIR/mipmap-xxhdpi"
      OUTPUT_XHDPI="$OUTPUT_DIR/mipmap-xhdpi"
      OUTPUT_HDPI="$OUTPUT_DIR/mipmap-hdpi"
      OUTPUT_MDPI="$OUTPUT_DIR/mipmap-mdpi"
      OUTPUT_LDPI="$OUTPUT_DIR/mipmap-ldpi" ;;
 
-  *) # OUTPUT_XXXHDPI="drawable-xxxhdpi"
+  *) OUTPUT_XXXHDPI="$OUTPUT_DIR/drawable-xxxhdpi"
      OUTPUT_XXHDPI="$OUTPUT_DIR/drawable-xxhdpi"
      OUTPUT_XHDPI="$OUTPUT_DIR/drawable-xhdpi"
      OUTPUT_HDPI="$OUTPUT_DIR/drawable-hdpi"
@@ -126,6 +126,7 @@ case "$SCALE_TYPE" in
      OUTPUT_LDPI="$OUTPUT_DIR/drawable-ldpi" ;;
 esac
 
+mkdir -p "$OUTPUT_XXXHDPI"
 mkdir -p "$OUTPUT_XXHDPI"
 mkdir -p "$OUTPUT_XHDPI"
 mkdir -p "$OUTPUT_HDPI"
@@ -138,6 +139,9 @@ for FILE in ${FILES[*]}
 do
     FILE_NAME=$(echo "$FILE" | tr '[:upper:]' '[:lower:]')
     FILE_NAME=${FILE_NAME// /_}
+
+    echo "Scaling \"$FILE\" to $SCALE_XXXHDPI in $OUTPUT_XXXHDPI/$FILE_NAME"
+    convert $FILE -resize $SCALE_XXXHDPI! -strip $OUTPUT_XXXHDPI/$FILE_NAME
 
     echo "Scaling \"$FILE\" to $SCALE_XXHDPI in $OUTPUT_XXHDPI/$FILE_NAME"
     convert $FILE -resize $SCALE_XXHDPI! -strip $OUTPUT_XXHDPI/$FILE_NAME
