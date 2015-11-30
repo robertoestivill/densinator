@@ -3,7 +3,11 @@
 Densinator is a Bash script, that scans your current directory looking for image files, and generates the drawables for all Android densities.
 
 
-Densinator requires [ImageMagick](http://www.imagemagick.org/script/binary-releases.php) to be installed and correctly configured.
+Densinator requires the following libraries to be installed and available on `$PATH`
+
+- [ImageMagick](http://www.imagemagick.org/script/binary-releases.php) for image size manipulation
+- [pngquant](https://pngquant.org/) for PNG size optimization
+
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Densinator-green.svg?style=flat)](https://android-arsenal.com/details/1/2535)
 
@@ -40,26 +44,28 @@ Select file [ALL]:
 
 ```
 Select scale type [Porcentual]:
-1) Porcentual (original is considered xxxhdpi)
-2) Launcher icon (mipmap instead of drawable)
+1) Porcentual
+2) Launcher icon
 3) Action bar icon
 4) Notification icon
 ```
 
 
-**Generate LDPI**
+**Enter base size**
 
 ```
-Generate LDPI [No]:
-1) No
-2) Yes
+Enter base [width]x[height] size for the xxxhdpi [original size]:
+
+
 ```
 
 
-**Output directory**
+**Resource directory**
 
 ```
-Enter output dir [generated/]:
+Select resource directory [drawable]:
+1) drawable
+2) mipmap
 ```
 
 ## Example

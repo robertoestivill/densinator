@@ -25,8 +25,14 @@
 # Requires ImageMagick
 # brew install imagemagick
 
+# Requires pngquant
+# brew install pngquant
+
+
 #################
 ### SELECT FILES
+###
+
 OLDIFS="$IFS"
 IFS=$'\n'
 FILES_PNG=`ls | grep -i .png`
@@ -47,10 +53,12 @@ if [ -z "$FILE_SELECTION" ] || [ "$(( FILE_SELECTION - 1 ))" == "${#FILES_ALL[@]
 else
   FILES=${FILES_ALL[$(( FILE_SELECTION - 1 ))]}
 fi
+echo ""
 
 #################
 ### SCALE TYPE
-echo ""
+###
+
 echo "Select scale type [Porcentual]:"
 echo "1) Porcentual"
 echo "2) Launcher icon"
@@ -59,109 +67,157 @@ echo "4) Notification icon"
 read SCALE_TYPE
 
 case "$SCALE_TYPE" in
-  2) SCALE_XXXHDPI="192x192"
-     SCALE_XXHDPI="144x144"
-     SCALE_XHDPI="96x96"
-     SCALE_HDPI="72x72"
-     SCALE_MDPI="48x48"
-     SCALE_LDPI="32x32" ;;
-
-  3) SCALE_XXXHDPI="128x128"
-     SCALE_XXHDPI="96x96"
-     SCALE_XHDPI="64x64"
-     SCALE_HDPI="48x48"
-     SCALE_MDPI="32x32"
-     SCALE_LDPI="24x24" ;;
-
-  4) SCALE_XXXHDPI="96x96"
-     SCALE_XXHDPI="72x72"
-     SCALE_XHDPI="48x48"
-     SCALE_HDPI="36x36"
-     SCALE_MDPI="24x24"
-     SCALE_LDPI="18x18" ;;
-
-  *) SCALE_XXXHDPI="100%"
-     SCALE_XXHDPI="75%"
-     SCALE_XHDPI="50%"
-     SCALE_HDPI="37.5%"
-     SCALE_MDPI="25%"
-     SCALE_LDPI="18.75%" ;;
+  2) BASE_SIZE="192x192" ;;
+  3) BASE_SIZE="128x128" ;;
+  4) BASE_SIZE="96x96" ;;
 esac
+
+if [ -z "$BASE_SIZE" ] ; then
+  echo ""
+  echo "Enter base [width]x[height] size for the xxxhdpi [original size]:"
+  read BASE_SIZE
+fi
+echo ""
 
 #################
-### GENERATE LDPI
-echo ""
-echo "Generate LDPI [No]:"
-echo "1) No"
-echo "2) Yes"
-read GENERATE_LDPI
+### SELECT RESOURCE PREFFIX
+###
 
-case "$GENERATE_LDPI" in
-  2) GENERATE_LDPI=true ;;
-  *) GENERATE_LDPI=false ;;
+echo "Select resource directory [drawable]:"
+echo "1) drawable"
+echo "2) mipmap"
+read RESOURCE_PREFFIX
+
+case "$RESOURCE_PREFFIX" in 
+	2) OUTPUT="mipmap" ;;
+	*) OUTPUT="drawable" ;;
 esac
+echo ""
+
 
 #################
-### SELECT OUTPUT DIR
-echo ""
-echo "Enter output dir [generated/]:"
-read OUTPUT_DIR
-if [ -z "$OUTPUT_DIR" ] ; then
-  OUTPUT_DIR="generated"
-fi
+### CREATE DIRECTORIES
+###
 
-case "$SCALE_TYPE" in
-  2) OUTPUT_XXXHDPI="$OUTPUT_DIR/mipmap-xxxhdpi"
-     OUTPUT_XXHDPI="$OUTPUT_DIR/mipmap-xxhdpi"
-     OUTPUT_XHDPI="$OUTPUT_DIR/mipmap-xhdpi"
-     OUTPUT_HDPI="$OUTPUT_DIR/mipmap-hdpi"
-     OUTPUT_MDPI="$OUTPUT_DIR/mipmap-mdpi"
-     OUTPUT_LDPI="$OUTPUT_DIR/mipmap-ldpi" ;;
+DIR_BASE=densinator
+DIR_TMP=$DIR_BASE/temp
+DIR_OUTPUT_XXXHDPI=$DIR_BASE/$OUTPUT-xxxhdpi
+DIR_OUTPUT_XXHDPI=$DIR_BASE/$OUTPUT-xxhdpi
+DIR_OUTPUT_XHDPI=$DIR_BASE/$OUTPUT-xhdpi
+DIR_OUTPUT_HDPI=$DIR_BASE/$OUTPUT-hdpi
+DIR_OUTPUT_MDPI=$DIR_BASE/$OUTPUT-mdpi
+DIR_OUTPUT_LDPI=$DIR_BASE/$OUTPUT-ldpi
 
-  *) OUTPUT_XXXHDPI="$OUTPUT_DIR/drawable-xxxhdpi"
-     OUTPUT_XXHDPI="$OUTPUT_DIR/drawable-xxhdpi"
-     OUTPUT_XHDPI="$OUTPUT_DIR/drawable-xhdpi"
-     OUTPUT_HDPI="$OUTPUT_DIR/drawable-hdpi"
-     OUTPUT_MDPI="$OUTPUT_DIR/drawable-mdpi"
-     OUTPUT_LDPI="$OUTPUT_DIR/drawable-ldpi" ;;
-esac
+mkdir -p "$DIR_TMP"
+mkdir -p "$DIR_OUTPUT_XXXHDPI"
+mkdir -p "$DIR_OUTPUT_XXHDPI"
+mkdir -p "$DIR_OUTPUT_XHDPI"
+mkdir -p "$DIR_OUTPUT_HDPI"
+mkdir -p "$DIR_OUTPUT_MDPI"
+mkdir -p "$DIR_OUTPUT_LDPI"
 
-mkdir -p "$OUTPUT_XXXHDPI"
-mkdir -p "$OUTPUT_XXHDPI"
-mkdir -p "$OUTPUT_XHDPI"
-mkdir -p "$OUTPUT_HDPI"
-mkdir -p "$OUTPUT_MDPI"
-if $GENERATE_LDPI ; then
-  mkdir -p "$OUTPUT_LDPI"
-fi
+
+#################
+### FIX FILE NAME FUNCTION
+###
+### $1 file 
+
+function fix_name {
+	start_log_msg "   Fixing name"
+	FILE_NAME=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+    FILE_NAME=${FILE_NAME// /_}
+    FILE_NAME=${FILE_NAME//-/_}
+    echo "DONE"
+}
+
+
+#################
+### CREATE BASE FILE FUNCTION
+###
+### $1 input file
+### $2 output file
+### $3 base size 
+
+function create_base {
+	start_log_msg "   Creating base file"
+	if [ -z "$3" ] ; then
+  		cp $1 $2
+	else
+		convert $1 -resize $3! -strip $2
+	fi
+	echo "DONE"
+}
+
+
+#################
+### PROCESS FUNCTION
+###
+### $1 input file
+### $2 output file
+### $3 scale
+### $4 description
+
+function process {
+	start_log_msg "   Scaling $4"
+    convert $1 -resize $3! -strip $2
+    echo "DONE"
+
+    start_log_msg "   Optimizing $4"
+    mv $2 $2.tmp
+    pngquant --output $2 $2.tmp   # pngquant doesn't support file overwrite
+	echo "DONE"
+}
+
+
+#################
+### PROCESS FUNCTION
+###
+### $1 message
+
+function start_log_msg {
+	echo -n "$1 "
+	for ((i=0; i< (30 - ${#1}); i++)){ echo -n "."; }
+	echo -n " "
+}
+
+
+#################
+### ITERATE OVER FILES
+###
 
 for FILE in ${FILES[*]}
-do
-    FILE_NAME=$(echo "$FILE" | tr '[:upper:]' '[:lower:]')
-    FILE_NAME=${FILE_NAME// /_}
+do	
+	echo -e "Processing $FILE"
 
-    echo "Scaling \"$FILE\" to $SCALE_XXXHDPI in $OUTPUT_XXXHDPI/$FILE_NAME"
-    convert $FILE -resize $SCALE_XXXHDPI! -strip $OUTPUT_XXXHDPI/$FILE_NAME
+	fix_name $FILE
 
-    echo "Scaling \"$FILE\" to $SCALE_XXHDPI in $OUTPUT_XXHDPI/$FILE_NAME"
-    convert $FILE -resize $SCALE_XXHDPI! -strip $OUTPUT_XXHDPI/$FILE_NAME
+    TMP_FILE=$DIR_TMP/$FILE_NAME
 
-    echo "Scaling \"$FILE\" to $SCALE_XHDPI in $OUTPUT_XHDPI/$FILE_NAME"
-    convert $FILE -resize $SCALE_XHDPI! -strip $OUTPUT_XHDPI/$FILE_NAME
+	create_base $FILE $TMP_FILE $BASE_SIZE
 
-    echo "Scaling \"$FILE\" to $SCALE_HDPI in $OUTPUT_HDPI/$FILE_NAME"
-    convert $FILE -resize $SCALE_HDPI! -strip $OUTPUT_HDPI/$FILE_NAME
+	process $TMP_FILE $DIR_OUTPUT_XXXHDPI/$FILE_NAME 100% "xxxhdpi" 
 
-    echo "Scaling \"$FILE\" to $SCALE_MDPI in $OUTPUT_MDPI/$FILE_NAME"
-    convert $FILE -resize $SCALE_MDPI! -strip $OUTPUT_MDPI/$FILE_NAME
+	process $TMP_FILE $DIR_OUTPUT_XXHDPI/$FILE_NAME 75% "xxhdpi" 
 
-    if $GENERATE_LDPI ; then
-      echo "Scaling \"$FILE\" to $SCALE_LDPI in $OUTPUT_LDPI/$FILE_NAME"
-      convert $FILE -resize $SCALE_LDPI! -strip $OUTPUT_LDPI/$FILE_NAME
-    fi
-    echo ""
+	process $TMP_FILE $DIR_OUTPUT_XHDPI/$FILE_NAME 50% "xhdpi" 
+
+	process $TMP_FILE $DIR_OUTPUT_HDPI/$FILE_NAME 37.5% "hdpi" 
+
+	process $TMP_FILE $DIR_OUTPUT_MDPI/$FILE_NAME 25% "mdpi" 
+
+	process $TMP_FILE $DIR_OUTPUT_LDPI/$FILE_NAME 18.75% "ldpi" 
+
+	echo -e ""
 done
 
+
+#################
+### CLEAN UP
+###
+
+rm -rf $DIR_TMP
 echo "Done."
+
 IFS="$OLDIFS"
-open $OUTPUT_DIR
+open .
+
