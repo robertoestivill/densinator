@@ -23,7 +23,7 @@
 #!/bin/sh
 
 # Requires ImageMagick
-# brew install imagemagick
+# brew install imagemagick --with-librsvg
 
 # Requires pngquant
 # brew install pngquant
@@ -38,7 +38,8 @@ IFS=$'\n'
 FILES_PNG=`ls | grep -i .png`
 FILES_JPG=`ls | grep -i .jpg`
 FILES_JPEG=`ls | grep -i .jpeg`
-FILES_ALL=( ${FILES_PNG[@]} ${FILES_JPG[@]} ${FILES_JPEG[@]} )
+FILES_SVG=`ls | grep -i .svg`
+FILES_ALL=( ${FILES_SVG[@]} ${FILES_PNG[@]} ${FILES_JPG[@]} ${FILES_JPEG[@]}  )
 
 echo ""
 echo "Select file [ALL]:"
@@ -127,6 +128,16 @@ function fix_name {
 	FILE_NAME=$(echo "$1" | tr '[:upper:]' '[:lower:]')
     FILE_NAME=${FILE_NAME// /_}
     FILE_NAME=${FILE_NAME//-/_}
+
+    if [ ${FILE_NAME: -4} == ".jpg" ] ; then
+		FILE_NAME=${FILE_NAME%.jpg}.png
+    fi
+	if [ ${FILE_NAME: -5} == ".jpeg" ] ; then
+		FILE_NAME=${FILE_NAME%.jpeg}.png
+    fi
+    if [ ${FILE_NAME: -4} == ".svg" ] ; then
+		FILE_NAME=${FILE_NAME%.svg}.png
+    fi
     echo "DONE"
 }
 
@@ -140,12 +151,22 @@ function fix_name {
 
 function create_base {
 	start_log_msg "   Creating base file"
-	if [ -z "$3" ] ; then
-  		cp $1 $2
-	else
-		convert $1 -resize $3! -strip $2
-	fi
-	echo "DONE"
+    if [ ${1: -4} == ".svg" ] ; then # if svg file
+        if [ -z "$3" ] ; then
+            echo "ERROR svg file found but base size was not defined"
+            exit 1
+        else
+            # Create big enough base file out of svg
+            convert -density 1200 $1 -background none -resize $3! $2
+        fi
+    else
+        if [ -z "$3" ] ; then # not svg file
+            cp $1 $2
+        else
+            convert $1 -resize $3! -strip $2
+        fi
+    fi
+    echo "DONE"
 }
 
 
@@ -219,5 +240,5 @@ rm -rf $DIR_TMP
 echo "Done."
 
 IFS="$OLDIFS"
-open .
+open $DIR_BASE
 

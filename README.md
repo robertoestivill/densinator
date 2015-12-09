@@ -6,8 +6,12 @@ Densinator is a Bash script, that scans your current directory looking for image
 Densinator requires the following libraries to be installed and available on `$PATH`
 
 - [ImageMagick](http://www.imagemagick.org/script/binary-releases.php) for image size manipulation
+
+>`$ brew install imagemagick --with-librsvg`
+
 - [pngquant](https://pngquant.org/) for PNG size optimization
 
+>`$ brew install pngquant`
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Densinator-green.svg?style=flat)](https://android-arsenal.com/details/1/2535)
 
@@ -67,6 +71,15 @@ Select resource directory [drawable]:
 1) drawable
 2) mipmap
 ```
+
+## Formats
+
+Densinator will scan the current directory for `png`, `jpg`, `jpeg` and `svg` files.
+
+The output files will always be `png`
+
+Support for `svg` files is currently very primitive.
+
 
 ## Example
 
