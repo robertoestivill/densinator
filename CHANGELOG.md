@@ -2,7 +2,7 @@
 
 - All output files are now `png`.
 - Initial support for `svg` files.
- - Make sure `imagemagick` has been installed with `--with-librsvg`. [This link] (http://stackoverflow.com/a/27524633/961759) provides instructions on how to do this.
+ - Make sure `imagemagick` has been installed with `--with-librsvg`. [This link](http://stackoverflow.com/a/27524633/961759) provides instructions on how to do this.
  - Make sure you select the output base size either by choosing one from the list, or manually entering it, otherwise the script will fail with the error `ERROR svg file found but base size was not defined`.
 - Fix: open the output folder after execution.
 
